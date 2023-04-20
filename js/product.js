@@ -14,7 +14,7 @@ const speechKanap = document.querySelector("#description");	// d'insertion des v
 const colorOptions = document.querySelector("#colors");
 const getProductQuantity = document.querySelector("#quantity");
 
-fetch(`https://kanap-rfoz.onrender.com:10000/api/products/${kanapPageId}`) //je ne selectionne QUE la partie du JSON qui m'interesse en fonction de l'id du kanap concerné à fetch
+fetch(`https://kanap-rfoz.onrender.com/api/products/${kanapPageId}`) //je ne selectionne QUE la partie du JSON qui m'interesse en fonction de l'id du kanap concerné à fetch
 	.then((res) => res.json())
 	.then((object) => {
 		const imgKanap = object.imageUrl;
