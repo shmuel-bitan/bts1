@@ -129,11 +129,11 @@ removeItem();
 main();
 
 async function main() {
-showBasket();         ////// affichage du DOM ( avec rappel du fetchApi //////
-removeItem();		  ////// suppression dynamique des articles du panier et 
-modifyQuantity();	  ////// modification des quantités
+showBasket();         
+removeItem();		 
+modifyQuantity();	 
 
-calculQteTotale();	  ////// mise à jour dynamique des quantités et prix totaux
+calculQteTotale();	 
 calculPrixTotal();
 };
 
@@ -141,7 +141,7 @@ calculPrixTotal();
 function calculQteTotale() {
 	let basketValue = getBasket();
 	const zoneTotalQuantity = document.querySelector("#totalQuantity");
-	let quantityInBasket = []; // création d'un tableau vide pour accumuler les qtés
+	let quantityInBasket = []; 
 	if (basketValue === null || basketValue.length === 0) {
 		messagePanierVide();
 	} else {
@@ -169,11 +169,120 @@ async function calculPrixTotal() {
 modifyQuantity();
 removeItem();
 
-/**functionmessagePanierVide(){
-	const cartTitle = document.querySelector(
-		" div.cart"
-	)
-};*/
+
 
 localStorage.setItem("kanapLs", JSON.stringify(basketValue));
 
+const zoneFirstNameErrorMsg = document.querySelector("#firstNameErrorMsg");
+const zoneLastNameErrorMsg = document.querySelector("#lastNameErrorMsg");
+const zoneAddressErrorMsg = document.querySelector("#addressErrorMsg");
+const zoneCityErrorMsg = document.querySelector("#cityErrorMsg");
+const zoneEmailErrorMsg = document.querySelector("#emailErrorMsg");
+
+const inputFirstName = document.getElementById("firstName");
+const inputLastName = document.getElementById("lastName");
+const inputAddress = document.getElementById("address");
+const inputCity = document.getElementById("city");
+const inputEmail = document.getElementById("email");
+
+const regexFirstName = /^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*$/;
+const regexLastName = regexFirstName;
+const regexAddress = /^[#.0-9a-zA-ZÀ-ÿ\s,-]{2,60}$/; 
+const regexCity = regexFirstName;
+const regexEmail = /^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$/;
+
+function messagePanierVide() {
+	const cartTitle = document.querySelector(
+		"#limitedWidthBlock div.cartAndFormContainer > h1"
+	);
+	const emptyCartMessage = "Oups ! Votre panier est vide !";
+	cartTitle.textContent = emptyCartMessage;
+	cartTitle.style.fontSize = "40px";
+
+	document.querySelector(".cart__order").style.display = "none"; 
+	document.querySelector(".cart__price").style.display = "none";
+};
+
+const zoneOrderButton = document.querySelector("#order");
+
+zoneOrderButton.addEventListener("click", function(e) {
+    e.preventDefault(); // on empeche le formulaire de fonctionner par defaut si aucun contenu
+
+    // recupération des inputs du formulaire //
+
+    let checkFirstName = inputFirstName.value;
+    let checkLastName = inputLastName.value;
+    let checkAddress = inputAddress.value;
+    let checkCity = inputCity.value;
+    let checkEmail = inputEmail.value;
+
+    // mise en place des conditions de validation des champs du formulaire //
+
+function orderValidation() {
+	zoneFirstNameErrorMsg.innerHTML = "";
+	zoneLastNameErrorMsg.innerHTML = "";
+	zoneAddressErrorMsg.innerHTML = "";
+	zoneCityErrorMsg.innerHTML = "";
+	zoneEmailErrorMsg.innerHTML = "";
+
+
+    let basketValue = getBasket();
+
+    if (regexFirstName.test(checkFirstName) == false || checkFirstName === "") {
+        zoneFirstNameErrorMsg.innerHTML = "Merci de renseigner un prénom valide";
+        return false;
+    } else if (
+        regexLastName.test(checkLastName) == false ||
+        checkLastName === ""
+    ) {
+        zoneLastNameErrorMsg.innerHTML = "Merci de renseigner un nom de famille valide";
+        return false;
+    } else if (
+        regexAddress.test(checkAddress) == false ||
+        checkAddress === ""
+    ) {
+        zoneAddressErrorMsg.innerHTML =
+            "Merci de renseigner une adresse valide (Numéro, voie, nom de la voie, code postal)";
+        return false;
+    } else if (regexCity.test(checkCity) == false || checkCity === "") {
+        zoneCityErrorMsg.innerHTML = "Merci de renseigner un nom de ville valide";
+        return false;
+    } else if (regexEmail.test(checkEmail) == false || checkEmail === "") {
+        zoneEmailErrorMsg.innerHTML =
+            "Merci de renseigner une adresse email valide";
+        return false;
+    }
+    // si tous les champs du formulaire sont correctement remplis //
+    else {
+		let contact = {
+            firstName: checkFirstName,
+            lastName: checkLastName,
+            address: checkAddress,
+            city: checkCity,
+            email: checkEmail,
+        };
+        let products = [];
+		
+		for (let canapId of basketValue) {
+            products.push(canapId.idSelectedProduct);
+        }
+
+        let finalOrderObject = { contact, products };
+		const orderId = fetch("https://kanap-rfoz.onrender.com/api/products/order", {
+            method: "POST",
+            body: JSON.stringify(finalOrderObject),
+            headers: {
+                "Content-type": "application/json",
+            },
+        });
+        orderId.then(async function (response) {
+            // réponse de l'API //
+            const retour = await response.json();
+            //renvoi vers la page de confirmation avec l'ID de commande //
+            window.location.href = `confirmation.html?orderId=${retour.orderId}`;
+        }) 
+    }
+}
+
+orderValidation();
+});
