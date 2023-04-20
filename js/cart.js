@@ -4,7 +4,7 @@ let basketArrayFull = [];
 let basketClassFull = JSON.parse(localStorage.getItem("kanapLs"));
 if (basketClassFull !== null) {
 for (let g = 0; g < basketClassFull.length; g++) {
-	await fetch("https://kanap-rfoz.onrender.com:10000/api/products/" + basketClassFull[g].idSelectedProduct)
+	await fetch("https://kanap-rfoz.onrender.com/api/products/" + basketClassFull[g].idSelectedProduct)
 		.then((res) => res.json())
 		.then((canap) => {
 			const article = {
